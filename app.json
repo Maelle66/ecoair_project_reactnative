@@ -1,0 +1,83 @@
+{
+  "expo": {
+    "name": "Eco-Air",
+    "slug": "eco-air",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.MaelleProject.ecoair",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Eco-Air utilise votre position pour afficher la qualité de l'air à votre emplacement actuel.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Eco-Air utilise votre position pour afficher la qualité de l'air à votre emplacement actuel.",
+        "UIBackgroundModes": [
+          "location"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.MaelleProject.ecoair",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Permet à Eco-Air d'accéder à votre position pour afficher la qualité de l'air locale.",
+          "locationAlwaysPermission": "Permet à Eco-Air d'accéder à votre position en arrière-plan pour les notifications de qualité de l'air.",
+          "locationWhenInUsePermission": "Permet à Eco-Air d'accéder à votre position lorsque vous utilisez l'application.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#00E400",
+          "sounds": [
+            "./assets/notification-sound.wav"
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "waqiApiKey": "05ef8f5ab65f63e2d00f65a93e35009190308f84s",
+      "eas": {
+        "projectId": "ECOAIR_PROJECT"
+      }
+    },
+    "owner": "Maelle",
+    "scheme": "ecoair",
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/your-project-id"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    }
+  }
+}
