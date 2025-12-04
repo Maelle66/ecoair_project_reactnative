@@ -9,48 +9,54 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAirQuality } from '../hooks/useAirQuality';
-import { getSearchHistory, saveSearchHistory, clearSearchHistory } from '../utils/asyncStorage';
+import { getSearchHistory, saveSearchHistory } from '../utils/asyncStorage';
 
 export default function SearchScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchHistory, setSearchHistory] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchCity, setSearchCity] = useState(null);
 
-  const { data, loading, aqi, city, qualityLevel } = useAirQuality(
-    isSearching ? searchQuery : null
+  const { data, loading, aqi, city, qualityLevel } = useAirQuality(searchCity);
+
+  // Charger l'historique au montage ET quand on revient sur l'écran
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('🔄 SearchScreen focus - rechargement historique');
+      loadHistory();
+    }, [])
   );
 
   useEffect(() => {
-    loadHistory();
-  }, []);
-
-  useEffect(() => {
-    if (data && isSearching) {
-      saveSearchToHistory(city || searchQuery);
-      setIsSearching(false);
+    if (data && searchCity) {
+      console.log('✅ Données reçues:', data);
+      saveSearchToHistory(city || searchCity);
     }
   }, [data]);
 
   const loadHistory = async () => {
+    console.log('📜 Chargement de l\'historique...');
     const history = await getSearchHistory();
+    console.log('📊 Historique récupéré:', history);
     setSearchHistory(history);
   };
 
   const saveSearchToHistory = async (cityName) => {
     await saveSearchHistory(cityName);
-    await loadHistory();
+    await loadHistory(); // Recharger après sauvegarde
   };
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      setIsSearching(true);
+      console.log('🔍 Recherche de:', searchQuery.trim());
+      setSearchCity(searchQuery.trim());
     }
   };
 
   const handleSelectHistory = (cityName) => {
     setSearchQuery(cityName);
-    setIsSearching(true);
+    setSearchCity(cityName);
   };
 
   const handleClearHistory = async () => {
@@ -150,9 +156,6 @@ export default function SearchScreen({ navigation }) {
         <View style={styles.historyContainer}>
           <View style={styles.historyHeader}>
             <Text style={styles.historyTitle}>Recherches récentes</Text>
-            <TouchableOpacity onPress={handleClearHistory}>
-              <Text style={styles.clearText}>Effacer</Text>
-            </TouchableOpacity>
           </View>
           <FlatList
             data={searchHistory}

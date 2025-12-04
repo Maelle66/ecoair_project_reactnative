@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Alert,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,13 +14,14 @@ import {
   saveNotificationPreferences,
   clearSearchHistory,
 } from '../utils/asyncStorage';
+import { showAlert, showSimpleAlert, showActionSheet } from '../utils/alertHelper';
 
 // Import conditionnel selon la plateforme
 const db = Platform.OS === 'web'
   ? require('../utils/sqliteDatabaseWeb')
   : require('../utils/sqliteDatabase');
 
-const { getDatabaseStats, resetDatabase } = db;
+const { getDatabaseStats, resetDatabase, clearSearchHistory: clearSearchHistoryDB } = db;
 
 export default function SettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -53,29 +53,52 @@ export default function SettingsScreen() {
   };
 
   const handleThresholdChange = () => {
-    Alert.alert(
+    console.log('🔔 Ouverture du sélecteur de seuil');
+    
+    showActionSheet(
       'Seuil d\'alerte',
       'Choisissez le niveau AQI pour recevoir une alerte',
       [
-        { text: '100 - Modéré', onPress: () => updateThreshold(100) },
-        { text: '150 - Mauvais', onPress: () => updateThreshold(150) },
-        { text: '200 - Très mauvais', onPress: () => updateThreshold(200) },
+        { 
+          text: '100 - Modéré', 
+          onPress: () => {
+            console.log('✅ Seuil 100 sélectionné');
+            updateThreshold(100);
+          }
+        },
+        { 
+          text: '150 - Mauvais', 
+          onPress: () => {
+            console.log('✅ Seuil 150 sélectionné');
+            updateThreshold(150);
+          }
+        },
+        { 
+          text: '200 - Très mauvais', 
+          onPress: () => {
+            console.log('✅ Seuil 200 sélectionné');
+            updateThreshold(200);
+          }
+        },
         { text: 'Annuler', style: 'cancel' },
       ]
     );
   };
 
   const updateThreshold = async (value) => {
+    console.log('📝 Mise à jour du seuil:', value);
     setAlertThreshold(value);
     await saveNotificationPreferences({
       enabled: notificationsEnabled,
       alertThreshold: value,
     });
-    Alert.alert('✓', `Seuil mis à jour : AQI ${value}`);
+    showSimpleAlert('✓', `Seuil mis à jour : AQI ${value}`);
   };
 
-  const handleClearHistory = async () => {
-    Alert.alert(
+  const handleClearHistory = () => {
+    console.log('🗑️ Demande d\'effacement historique');
+    
+    showAlert(
       'Effacer l\'historique',
       'Voulez-vous vraiment effacer votre historique de recherche ?',
       [
@@ -84,12 +107,27 @@ export default function SettingsScreen() {
           text: 'Effacer',
           style: 'destructive',
           onPress: async () => {
-            const result = await clearSearchHistory();
-            if (result) {
-              Alert.alert('✓', 'Historique effacé');
-              await loadStats();
-            } else {
-              Alert.alert('Erreur', 'Impossible d\'effacer l\'historique');
+            console.log('🔄 Effacement en cours...');
+            try {
+              // Effacer AsyncStorage
+              const resultAsync = await clearSearchHistory();
+              console.log('📊 Résultat AsyncStorage:', resultAsync);
+              
+              // Effacer SQLite/Web DB
+              const resultDB = await clearSearchHistoryDB();
+              console.log('📊 Résultat Database:', resultDB);
+              
+              if (resultAsync && resultAsync.success) {
+                showSimpleAlert('✓', 'Historique effacé');
+                await loadStats();
+                console.log('✅ Historique effacé avec succès (AsyncStorage + DB)');
+              } else {
+                showSimpleAlert('Erreur', 'Impossible d\'effacer l\'historique');
+                console.error('❌ Échec effacement:', resultAsync);
+              }
+            } catch (error) {
+              console.error('❌ Exception:', error);
+              showSimpleAlert('Erreur', 'Une erreur est survenue');
             }
           },
         },
@@ -98,7 +136,9 @@ export default function SettingsScreen() {
   };
 
   const handleResetDatabase = () => {
-    Alert.alert(
+    console.log('⚠️ Demande de réinitialisation');
+    
+    showAlert(
       '⚠️ Réinitialiser l\'application',
       'Cela supprimera TOUS vos favoris et données. Cette action est irréversible.',
       [
@@ -107,12 +147,22 @@ export default function SettingsScreen() {
           text: 'Réinitialiser',
           style: 'destructive',
           onPress: async () => {
-            const result = await resetDatabase();
-            if (result.success) {
-              await loadStats();
-              Alert.alert('✓', 'Application réinitialisée');
-            } else {
-              Alert.alert('Erreur', 'Impossible de réinitialiser');
+            console.log('🔄 Réinitialisation en cours...');
+            try {
+              const result = await resetDatabase();
+              console.log('📊 Résultat resetDatabase:', result);
+              
+              if (result && result.success) {
+                await loadStats();
+                showSimpleAlert('✓', 'Application réinitialisée');
+                console.log('✅ Réinitialisation réussie');
+              } else {
+                showSimpleAlert('Erreur', 'Impossible de réinitialiser');
+                console.error('❌ Échec réinitialisation:', result);
+              }
+            } catch (error) {
+              console.error('❌ Exception:', error);
+              showSimpleAlert('Erreur', 'Une erreur est survenue');
             }
           },
         },
@@ -155,6 +205,7 @@ export default function SettingsScreen() {
           <TouchableOpacity
             style={styles.settingItem}
             onPress={handleThresholdChange}
+            activeOpacity={0.7}
           >
             <View style={styles.settingLeft}>
               <Ionicons name="speedometer-outline" size={24} color="#00E400" />
@@ -191,7 +242,11 @@ export default function SettingsScreen() {
           </View>
         )}
 
-        <TouchableOpacity style={styles.settingItem} onPress={handleClearHistory}>
+        <TouchableOpacity 
+          style={styles.settingItem} 
+          onPress={handleClearHistory}
+          activeOpacity={0.7}
+        >
           <View style={styles.settingLeft}>
             <Ionicons name="time-outline" size={24} color="#FF9500" />
             <View style={styles.settingText}>
@@ -207,6 +262,7 @@ export default function SettingsScreen() {
         <TouchableOpacity
           style={styles.settingItem}
           onPress={handleResetDatabase}
+          activeOpacity={0.7}
         >
           <View style={styles.settingLeft}>
             <Ionicons name="trash-outline" size={24} color="#FF3B30" />

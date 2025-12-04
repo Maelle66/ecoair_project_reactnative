@@ -5,11 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAirQuality } from '../hooks/useAirQuality';
+import { showSimpleAlert } from '../utils/alertHelper';
 
 // Import conditionnel selon la plateforme
 const db = Platform.OS === 'web'
@@ -47,7 +47,7 @@ export default function CityDetailScreen({ route, navigation }) {
       if (item) {
         await removeFavorite(item.id);
         setFavorite(false);
-        Alert.alert('✓', `${cityName} retiré des favoris`);
+        showSimpleAlert('✓', `${cityName} retiré des favoris`);
       }
     } else {
       // Ajouter aux favoris
@@ -59,9 +59,9 @@ export default function CityDetailScreen({ route, navigation }) {
       );
       if (result.success) {
         setFavorite(true);
-        Alert.alert('✓', `${cityName} ajouté aux favoris`);
+        showSimpleAlert('✓', `${cityName} ajouté aux favoris`);
       } else {
-        Alert.alert('Erreur', result.error);
+        showSimpleAlert('Erreur', result.error);
       }
     }
   };

@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Alert,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocation } from '../hooks/useLocation';
 import { useAirQuality } from '../hooks/useAirQuality';
+import { showSimpleAlert } from '../utils/alertHelper';
 
 // Import conditionnel selon la plateforme
 const db = Platform.OS === 'web'
@@ -62,13 +62,13 @@ export default function HomeScreen({ navigation }) {
 
   const handleAddLocationToFavorites = async () => {
     if (!city || !location) {
-      Alert.alert('Erreur', 'Aucune localisation disponible');
+      showSimpleAlert('Erreur', 'Aucune localisation disponible');
       return;
     }
 
     const alreadyFavorite = await isFavorite(city);
     if (alreadyFavorite) {
-      Alert.alert('Info', `${city} est déjà dans vos favoris`);
+      showSimpleAlert('Info', `${city} est déjà dans vos favoris`);
       return;
     }
 
@@ -80,9 +80,9 @@ export default function HomeScreen({ navigation }) {
     );
 
     if (result.success) {
-      Alert.alert('✓', `${city} ajouté aux favoris`);
+      showSimpleAlert('✓', `${city} ajouté aux favoris`);
     } else {
-      Alert.alert('Erreur', result.error || 'Impossible d\'ajouter aux favoris');
+      showSimpleAlert('Erreur', result.error || 'Impossible d\'ajouter aux favoris');
     }
   };
 

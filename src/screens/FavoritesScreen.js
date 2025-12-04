@@ -5,13 +5,13 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
   RefreshControl,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAirQuality } from '../hooks/useAirQuality';
+import { showAlert } from '../utils/alertHelper';
 
 // Import conditionnel selon la plateforme
 const db = Platform.OS === 'web'
@@ -107,7 +107,7 @@ export default function FavoritesScreen({ navigation }) {
   };
 
   const handleDelete = async (item) => {
-    Alert.alert(
+    showAlert(
       'Supprimer le favori',
       `Voulez-vous retirer ${item.name} de vos favoris ?`,
       [

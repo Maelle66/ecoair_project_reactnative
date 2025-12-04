@@ -69,53 +69,6 @@ npx expo start
 
 ---
 
-## 📁 Structure du projet
-
-```
-eco-air/
-│
-├── 📄 App.js                          # Point d'entrée principal
-├── 📄 app.json                        # Configuration Expo
-├── 📄 package.json                    # Dépendances npm
-│
-├── 📁 assets/                         # Assets visuels
-│   ├── icon.png                       # Icône de l'app (1024x1024)
-│   ├── adaptive-icon.png              # Icône Android (1024x1024)
-│   ├── splash.png                     # Splash screen (1242x2436)
-│   └── favicon.png                    # Favicon web (48x48)
-│
-├── 📁 screens/                        # Écrans de l'application
-│   ├── HomeScreen.js                  # Écran d'accueil (position actuelle)
-│   ├── SearchScreen.js                # Recherche de villes
-│   ├── FavoritesScreen.js             # Liste des favoris
-│   ├── SettingsScreen.js              # Paramètres de l'app
-│   ├── CityDetailScreen.js            # Détails d'une ville
-│   └── OnboardingScreen.js            # Premier lancement
-│
-├── 📁 components/                     # Composants réutilisables
-│   ├── AirQualityCard.js              # Card affichage AQI
-│   ├── CityCard.js                    # Card pour une ville
-│   ├── SearchBar.js                   # Barre de recherche
-│   ├── LoadingSpinner.js              # Spinner de chargement
-│   ├── ErrorMessage.js                # Affichage d'erreurs
-│   └── AQIBadge.js                    # Badge AQI compact
-│
-├── 📁 hooks/                          # Hooks personnalisés
-│   ├── useAirQuality.js               # Hook API WAQI
-│   ├── useLocation.js                 # Hook géolocalisation
-│   └── useFavorites.js                # Hook gestion favoris
-│
-└── 📁 utils/                          # Utilitaires
-    ├── asyncStorage.js                # Stockage simple (AsyncStorage)
-    ├── sqliteDatabase.js              # Base de données (mobile - SQLite)
-    ├── sqliteDatabaseWeb.js           # Base de données (web - AsyncStorage)
-    ├── database.js                    # Sélecteur de DB selon plateforme
-    ├── constants.js                   # Constantes globales
-    └── helpers.js                     # Fonctions utilitaires
-```
-
----
-
 ## 🛠️ Technologies utilisées
 
 ### Frontend

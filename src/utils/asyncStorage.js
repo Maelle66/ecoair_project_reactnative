@@ -201,6 +201,7 @@ export const getSearchHistory = async () => {
 export const clearSearchHistory = async () => {
   try {
     await removeData(STORAGE_KEYS.SEARCH_HISTORY);
+    console.log('✅ Historique AsyncStorage effacé');
     return { success: true };
   } catch (error) {
     console.error('Erreur vidage historique:', error);
