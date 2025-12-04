@@ -1,25 +1,44 @@
-# Node
+# Dépendances
 node_modules/
+.pnp
+.pnp.js
 
-# Logs
-npm-debug.log
-yarn-error.log
-*.log
-
-# React Native
+# Expo
 .expo/
 .expo-shared/
 dist/
-build/
+web-build/
 
-# Android
-android/app/build/
-android/build/
-android/.gradle/
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+android/
+ios/
 
-# iOS
-ios/build/
-ios/Pods/
-
-# Env files
+# Environnement
 .env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Build
+*.apk
+*.ipa
+*.aab
