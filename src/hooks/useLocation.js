@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
 import * as Location from 'expo-location';
 
 export const useLocation = (autoFetch = false) => {
@@ -10,6 +11,12 @@ export const useLocation = (autoFetch = false) => {
   // Demander la permission de localisation
   const requestPermission = async () => {
     try {
+      if (Platform.OS === 'web') {
+        // Sur web, pas besoin de demander via Expo
+        console.log('📍 Web : Permission géolocalisation gérée par le navigateur');
+        return true;
+      }
+      
       const { status } = await Location.requestForegroundPermissionsAsync();
       setPermissionStatus(status);
       return status === 'granted';
@@ -26,19 +33,29 @@ export const useLocation = (autoFetch = false) => {
     setError(null);
 
     try {
-      // Vérifier d'abord si on a la permission
+      console.log('📍 Demande de permission de localisation...');
+      
+      // Sur web, utiliser l'API native du navigateur
+      if (Platform.OS === 'web') {
+        return await getCurrentLocationWeb();
+      }
+      
+      // Sur mobile, utiliser Expo Location
       const { status } = await Location.getForegroundPermissionsAsync();
       
       if (status !== 'granted') {
+        console.log('⚠️ Permission non accordée, demande en cours...');
         const granted = await requestPermission();
         if (!granted) {
           setError('Permission de localisation refusée');
           setLoading(false);
+          console.error('❌ Permission refusée par l\'utilisateur');
           return null;
         }
       }
 
-      // Récupérer la position
+      console.log('🔄 Récupération de la position...');
+      
       const currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
@@ -50,15 +67,79 @@ export const useLocation = (autoFetch = false) => {
         accuracy: currentLocation.coords.accuracy,
       };
 
+      console.log('✅ Position obtenue:', coords);
       setLocation(coords);
       setLoading(false);
       return coords;
     } catch (err) {
-      setError('Impossible de récupérer votre position');
-      console.error('Erreur localisation:', err);
+      const errorMsg = 'Impossible de récupérer votre position';
+      setError(errorMsg);
+      console.error('❌ Erreur localisation:', err);
       setLoading(false);
       return null;
     }
+  };
+
+  // Fonction spécifique pour le web
+  const getCurrentLocationWeb = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        const error = 'La géolocalisation n\'est pas supportée par ce navigateur';
+        setError(error);
+        setLoading(false);
+        reject(new Error(error));
+        return;
+      }
+
+      console.log('🌐 Utilisation de l\'API Geolocation du navigateur');
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            altitude: position.coords.altitude,
+            accuracy: position.coords.accuracy,
+          };
+
+          console.log('✅ Position Web obtenue:', coords);
+          console.log('📏 Précision:', coords.accuracy, 'mètres');
+          
+          setLocation(coords);
+          setLoading(false);
+          resolve(coords);
+        },
+        (err) => {
+          let errorMsg = 'Erreur de géolocalisation';
+          
+          switch (err.code) {
+            case err.PERMISSION_DENIED:
+              errorMsg = 'Permission de localisation refusée. Autorisez la localisation dans votre navigateur.';
+              console.error('❌ Permission refusée par l\'utilisateur');
+              break;
+            case err.POSITION_UNAVAILABLE:
+              errorMsg = 'Position indisponible';
+              console.error('❌ Position indisponible');
+              break;
+            case err.TIMEOUT:
+              errorMsg = 'Délai de localisation dépassé';
+              console.error('❌ Timeout');
+              break;
+            default:
+              console.error('❌ Erreur inconnue:', err.message);
+          }
+          
+          setError(errorMsg);
+          setLoading(false);
+          reject(new Error(errorMsg));
+        },
+        {
+          enableHighAccuracy: true, // Utiliser le GPS si disponible
+          timeout: 10000, // 10 secondes
+          maximumAge: 0, // Ne pas utiliser de cache
+        }
+      );
+    });
   };
 
   // Obtenir l'adresse à partir des coordonnées (Reverse Geocoding)
