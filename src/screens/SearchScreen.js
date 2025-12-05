@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAirQuality } from '../hooks/useAirQuality';
 import { getSearchHistory, saveSearchHistory } from '../utils/asyncStorage';
+import eventEmitter, { EVENTS } from '../utils/eventEmitter';
 
 export default function SearchScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +28,22 @@ export default function SearchScreen({ navigation }) {
       loadHistory();
     }, [])
   );
+
+  // Écouter l'événement d'effacement d'historique
+  useEffect(() => {
+    const handleHistoryCleared = () => {
+      console.log('📡 Événement HISTORY_CLEARED reçu');
+      loadHistory();
+    };
+
+    // S'abonner à l'événement
+    eventEmitter.on(EVENTS.HISTORY_CLEARED, handleHistoryCleared);
+
+    // Se désabonner au démontage
+    return () => {
+      eventEmitter.off(EVENTS.HISTORY_CLEARED, handleHistoryCleared);
+    };
+  }, []);
 
   useEffect(() => {
     if (data && searchCity) {
@@ -51,6 +68,27 @@ export default function SearchScreen({ navigation }) {
     if (searchQuery.trim()) {
       console.log('🔍 Recherche de:', searchQuery.trim());
       setSearchCity(searchQuery.trim());
+    }
+  };
+
+  const handleClearHistoryTest = async () => {
+    console.log('🧪 Test effacement direct');
+    try {
+      // Méthode 1 : Via AsyncStorage
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.removeItem('@ecoair_search_history');
+      console.log('✅ Méthode 1 OK');
+      
+      // Recharger
+      await loadHistory();
+      
+      if (searchHistory.length === 0) {
+        console.log('✅ Historique vide confirmé');
+      } else {
+        console.error('❌ Historique toujours présent:', searchHistory);
+      }
+    } catch (error) {
+      console.error('❌ Erreur:', error);
     }
   };
 
@@ -156,6 +194,9 @@ export default function SearchScreen({ navigation }) {
         <View style={styles.historyContainer}>
           <View style={styles.historyHeader}>
             <Text style={styles.historyTitle}>Recherches récentes</Text>
+            <TouchableOpacity onPress={handleClearHistoryTest}>
+              <Text style={styles.clearText}>🧪 Test Effacer</Text>
+            </TouchableOpacity>
           </View>
           <FlatList
             data={searchHistory}

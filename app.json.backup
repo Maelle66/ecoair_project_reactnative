@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.MaelleProject.ecoair",
+      "bundleIdentifier": "com.Maelle.ecoair",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Eco-Air utilise votre position pour afficher la qualité de l'air à votre emplacement actuel.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Eco-Air utilise votre position pour afficher la qualité de l'air à votre emplacement actuel.",
@@ -30,7 +30,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.MaelleProject.ecoair",
+      "package": "com.Maelle.ecoair",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -65,16 +65,16 @@
       ]
     ],
     "extra": {
-      "waqiApiKey": "05ef8f5ab65f63e2d00f65a93e35009190308f84s",
       "eas": {
-        "projectId": "ECOAIR_PROJECT"
-      }
+        "projectId": "ecoair_project"
+      },
+      "waqiApiKey": "05ef8f5ab65f63e2d00f65a93e35009190308f84"
     },
     "owner": "Maelle",
     "scheme": "ecoair",
     "updates": {
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/your-project-id"
+      "url": "https://u.expo.dev/ecoair_project"
     },
     "runtimeVersion": {
       "policy": "sdkVersion"

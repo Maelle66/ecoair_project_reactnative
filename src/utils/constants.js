@@ -1,10 +1,26 @@
+import Constants from 'expo-constants';
+
 // ============================================
 // API CONFIGURATION
 // ============================================
 
+// Récupérer la clé API depuis les variables d'environnement
+// En développement : utilise app.json extra.waqiApiKey
+// En production : utilise EAS Secrets
+const getApiKey = () => {
+  // Méthode 1 : Depuis app.json (développement)
+  const fromAppJson = Constants.expoConfig?.extra?.waqiApiKey;
+  
+  // Méthode 2 : Depuis process.env (avec dotenv)
+  const fromEnv = process.env.WAQI_API_KEY;
+  
+  // Méthode 3 : Valeur par défaut 'demo' (non recommandé en production)
+  return fromAppJson || fromEnv || 'demo';
+};
+
 export const API_CONFIG = {
   WAQI_BASE_URL: 'https://api.waqi.info/feed',
-  WAQI_API_KEY: '05ef8f5ab65f63e2d00f65a93e35009190308f84',
+  WAQI_API_KEY: getApiKey(),
   DEFAULT_TIMEOUT: 10000, // 10 secondes
   CACHE_DURATION: 30, // 30 minutes
 };
@@ -227,7 +243,7 @@ export const APP_INFO = {
   name: 'Eco-Air',
   version: '1.0.0',
   description: 'Application de suivi de la qualité de l\'air',
-  author: 'Maelle',
+  author: 'Votre Nom',
   dataSource: 'World Air Quality Index (WAQI)',
   website: 'https://aqicn.org',
 };

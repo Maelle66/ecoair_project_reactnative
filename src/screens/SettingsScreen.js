@@ -15,6 +15,7 @@ import {
   clearSearchHistory,
 } from '../utils/asyncStorage';
 import { showAlert, showSimpleAlert, showActionSheet } from '../utils/alertHelper';
+import eventEmitter, { EVENTS } from '../utils/eventEmitter';
 
 // Import conditionnel selon la plateforme
 const db = Platform.OS === 'web'
@@ -118,6 +119,10 @@ export default function SettingsScreen() {
               console.log('📊 Résultat Database:', resultDB);
               
               if (resultAsync && resultAsync.success) {
+                // Émettre l'événement pour notifier SearchScreen
+                console.log('📡 Émission événement HISTORY_CLEARED');
+                eventEmitter.emit(EVENTS.HISTORY_CLEARED);
+                
                 showSimpleAlert('✓', 'Historique effacé');
                 await loadStats();
                 console.log('✅ Historique effacé avec succès (AsyncStorage + DB)');

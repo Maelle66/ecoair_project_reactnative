@@ -19,9 +19,11 @@ web-build/
 android/
 ios/
 
-# Environnement
+# Environnement - IMPORTANT
 .env
 .env.local
+.env.*.local
+app.config.js
 
 # Logs
 npm-debug.log*
@@ -37,8 +39,12 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+*.swo
 
 # Build
 *.apk
 *.ipa
 *.aab
+
+# Tests
+coverage/
