@@ -23,7 +23,7 @@ ios/
 .env
 .env.local
 .env.*.local
-app.config.js
+app.json.backup
 
 # Logs
 npm-debug.log*
